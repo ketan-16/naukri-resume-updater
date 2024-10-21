@@ -1,4 +1,5 @@
 # Importing required modules
+import logging
 import os
 import platform
 
@@ -13,6 +14,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
+
+# Basic configuration for logging
+logging.basicConfig(
+    level=logging.INFO,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    # format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',  # Format of log messages
+)
 
 # Loading Environment Variable
 load_dotenv()
@@ -69,20 +76,20 @@ def get_driver():
     try:
         driver = webdriver.Chrome(service=ChromeService(
             ChromeDriverManager().install()), options=options)
-        print("Google Chrome Launched!")
+        logging.info("ChromeDriver launched")
     except Exception as e:
-        print(f"Error launching Chrome: {e}")
+        logging.error(f"Error launching Chrome: {e}")
         return None
 
     # Set implicit wait time
     driver.implicitly_wait(5)
 
-    # Navigate to Naukri.com
+    # Navigate to site
     try:
         driver.get(login_url)
-        print("Naukri.com loaded successfully!")
+        logging.info("Site loaded successfully")
     except Exception as e:
-        print(f"Error loading Naukri.com: {e}")
+        logging.error(f"Error loading site: {e}")
         driver.quit()
         return None
 
@@ -118,13 +125,13 @@ def get_element(driver, element_tag, locator="ID"):
         if element:
             return element
         else:
-            print(f"Element not found with {locator}: {element_tag}")
+            logging.warning(f"Element not found with {locator}: {element_tag}")
             return None
 
     except (TimeoutException, NoSuchElementException) as e:
-        print(f"Error finding element with {locator}: {element_tag} - {e}")
+        logging.warning(f"Error finding element with {locator}: {element_tag} - {e}")
     except Exception as e:
-        print(f"Error: {e}")
+        logging.error(f"Error: {e}")
 
     return None
 
@@ -154,11 +161,10 @@ def wait_until_present(driver, element_tag, locator="ID", timeout=30):
         return True
 
     except TimeoutException:
-        print(f"Element not found with {locator}: {
-            element_tag} within {timeout} seconds.")
+        logging.warning(f"Element not found with {locator}: {element_tag} within {timeout} seconds.")
         return False
     except Exception as e:
-        print(f"Exception in WaitTillElementPresent: {e}")
+        logging.error(f"Exception in WaitTillElementPresent: {e}")
         return False
     finally:
         driver.implicitly_wait(3)  # Restore the implicit wait to its default
@@ -177,18 +183,18 @@ def login():
         # Load the Naukri website
         driver = get_driver()
         if driver is None:
-            print("Failed to load the browser.")
+            logging.error("Failed to load the browser.")
             return status, driver
 
         # Verify if the website loaded correctly
         if "naukri" not in driver.title.lower():
-            print("Failed to load Naukri.com correctly.")
+            logging.error("Failed to load Naukri.com correctly.")
             return status, driver
-        print("Website Loaded Successfully.")
+        logging.info("Website Loaded Successfully.")
 
         # Check and locate the login elements
         if not is_element_present(driver, By.ID, USERNAME_LOCATOR):
-            print("Login elements not found. Unable to login.")
+            logging.error("Login elements not found. Unable to login.")
             return status, driver
 
         email_field = get_element(driver, USERNAME_LOCATOR, locator="ID")
@@ -208,17 +214,17 @@ def login():
 
         # Verify successful login
         if wait_until_present(driver, LOGIN_CHECKPOINT_ID, locator="ID", timeout=LOGIN_CHECKPOINT_TIMEOUT):
-            print("Naukri Login Successful")
+            logging.info("Login Successful")
             status = True
         else:
-            print("Login checkpoint not found. Possible login failure.")
+            logging.warn("Login checkpoint not found. Automation may fail")
         return status, driver
     except Exception('WebDriverException') as wd_err:
-        print(f"WebDriver Error during login: {wd_err}")
+        logging.error(f"WebDriver Error during login: {wd_err}")
     except NoSuchElementException as no_elem_err:
-        print(f"Element not found during login: {no_elem_err}")
+        logging.error(f"Element not found during login: {no_elem_err}")
     except Exception as e:
-        print(f"Unexpected error during login: {e}")
+        logging.error(f"Unexpected error during login: {e}")
 
 
 def check_last_update_status(driver, checkpoint_xpath, locator, wait_time):
@@ -232,11 +238,11 @@ def check_last_update_status(driver, checkpoint_xpath, locator, wait_time):
             today_f2 = datetime.today().strftime("%b %#d, %Y")
 
             if today_f1 in last_updated_date or today_f2 in last_updated_date:
-                print(f"Resume Document Upload Successful. Last Updated date = {last_updated_date}")
+                logging.info(f"Resume uploaded successfully. Profile update date: {last_updated_date}")
             else:
-                print(f"Resume Document Upload failed. Last Updated date = {last_updated_date}")
+                logging.warning(f"Resume upload failed. Profile update date: {last_updated_date}")
         else:
-            print("Resume Document Upload failed. Last Updated date not found.")
+            logging.warning("Unable to locate profile update date! Resume upload failed.")
 
 
 def upload_resume(driver, resume_path):
@@ -273,9 +279,9 @@ def upload_resume(driver, resume_path):
             save_element.click()
         check_last_update_status(driver, CHECKPOINT_XPATH, "XPATH", 3)
     except TimeoutException:
-        print("Timeout while waiting for elements during resume upload.")
+        logging.error("Timeout while waiting for elements during resume upload.")
     except Exception as e:
-        print(f"Exception in UploadResume: {e}")
+        logging.error(f"Exception raised while uploading resume: {e}")
 
 
 def clean_up(driver):
@@ -288,12 +294,13 @@ def clean_up(driver):
         # Check if the driver instance is still active before attempting to quit
         if driver:
             driver.quit()
-            print("WebDriver session closed successfully.")
+            logging.info("WebDriver session closed successfully.")
     except Exception as e:
-        print(f"Error occurred while closing the WebDriver session: {e}")
+        logging.warning(f"Error occurred while closing the WebDriver session: {e}")
 
 
 def run_automation():
+    logging.info('Starting Automation...')
     try:
         status, driver = login()
         if status:
@@ -302,7 +309,7 @@ def run_automation():
             else:
                 raise FileNotFoundError
     except Exception as ex:
-        print(f"Automation Failed with exception: {ex}")
+        logging.error(f"Automation Failed with exception: {ex}")
     finally:
         clean_up(driver)
 
