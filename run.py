@@ -1,5 +1,6 @@
 # Importing required modules
 import os
+import platform
 
 from datetime import datetime
 from dotenv import load_dotenv
@@ -24,18 +25,16 @@ resume_path = os.path.abspath(os.path.join("resume", "Resume.pdf"))
 # Login URL
 login_url = "https://www.naukri.com/nlogin/login"
 
-
 # Constants
 USERNAME_LOCATOR = "usernameField"
 PASSWORD_LOCATOR = "passwordField"
 LOGIN_BTN_LOCATOR = "//*[@type='submit' and normalize-space()='Login']"
 SKIP_BTN_LOCATOR = "//*[text() = 'SKIP AND CONTINUE']"
 LOGIN_CHECKPOINT_ID = "ff-inventory"
-LOGIN_URL = "https://www.naukri.com"
-IMPLICIT_WAIT_TIME = 5
-SKIP_WAIT_TIME = 1
-LOGIN_CHECKPOINT_TIMEOUT = 5
+
+LOGIN_CHECKPOINT_TIMEOUT = 3
 GLOBAL_WAIT = 0.5
+FULLSCREEN_FLAG = False
 
 # Locator Mapping
 locator_mapping = {
@@ -58,8 +57,11 @@ def get_driver():
     # Set Chrome options
     options = webdriver.ChromeOptions()
     options.add_argument("--disable-notifications")
-    options.add_argument("--kiosk")  # Full-screen mode (for macOS/Linux)
-    # options.add_argument("--start-maximized")  # Uncomment for Windows users
+    if FULLSCREEN_FLAG:
+        if platform.system == "Windows":
+            options.add_argument("--start-maximized")
+        else:
+            options.add_argument("--kiosk")
     options.add_argument("--disable-popups")
     options.add_argument("--disable-gpu")
 
@@ -201,7 +203,7 @@ def login():
         login_button.send_keys(Keys.ENTER)
 
         # Handle optional skip button if it appears
-        if wait_until_present(driver, SKIP_BTN_LOCATOR, "XPATH", SKIP_WAIT_TIME):
+        if wait_until_present(driver, SKIP_BTN_LOCATOR, "XPATH", GLOBAL_WAIT):
             get_element(driver, SKIP_BTN_LOCATOR, "XPATH").click()
 
         # Verify successful login
