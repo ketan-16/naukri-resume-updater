@@ -18,8 +18,6 @@ Before you begin, ensure you have the following installed on your machine:
 - [Google Chrome](https://www.google.com/chrome/)
 - [ChromeDriver](https://chromedriver.chromium.org/downloads) *(optional, the script will handle it if not installed manually)*
 
-You will also need to create a free account on [Naukri.com](https://www.naukri.com) if you don't have one yet.
-
 ## Installation
 
 ### 1. Clone the repository
