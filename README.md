@@ -24,7 +24,7 @@ Before you begin, ensure you have the following installed on your machine:
 Start by cloning this repository to your local machine using:
 
 ```bash
-git clone https://github.com/yourusername/naukri-resume-updater.git
+git clone https://github.com/ketan-16/naukri-resume-updater.git
 cd naukri-resume-updater
 ```
 
@@ -93,8 +93,8 @@ The script can be automated to run at startup using various ways on Windows and 
 There are multiple ways to run the script at startup. The cleanest way I've found is [Tommy's answer on Stack Overflow](https://stackoverflow.com/a/29338130). A simpler way is by using Apple Shortcuts:
 - Create a shortcut from the Shortcuts app to run shell script and paste shell script to enter the virtual environment (optional) and invoke the python script.
 ```
-source /full/path/to/project/naukri-resume-update/venv/bin/activate
-python /full/path/to/project/naukri-resume-update/run.py
+source /full/path/to/project/naukri-resume-updater/venv/bin/activate
+python /full/path/to/project/naukri-resume-updater/run.py
 ```
 - Add the shortcut to Dock.
 - Right click on the Dock shortcut > Options > Open at login.
@@ -123,7 +123,7 @@ naukri-resume-updater/
     # Update the following line
     resume_path = os.path.abspath(os.path.join("resume", "Resume.pdf"))
     # With the following, with your absolute path to project (according to Windows and macOS)
-    resume_path = '/full/path/to/project/naukri-resume-update/resume/Resume.pdf'
+    resume_path = '/full/path/to/project/naukri-resume-updater/resume/Resume.pdf'
     ```
 
 ## Compatibility
