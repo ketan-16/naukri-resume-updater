@@ -18,7 +18,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 # Basic configuration for logging
 logging.basicConfig(
     level=logging.INFO,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-    # format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',  # Format of log messages
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',  # Format of log messages
 )
 
 # Loading Environment Variable

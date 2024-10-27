@@ -82,6 +82,24 @@ The script will:
 - The script will print logs to the console, informing you of each step being taken.
 - If there are any issues during the process (such as incorrect login details or failure to upload the resume), the error messages will be logged.
 
+## Automation
+The script can be automated to run at startup using various ways on Windows and macOS:
+
+### Windows: 
+- Create a batch script to enter the virtual environment (optional) and invoke the python script.
+- Copy a shortcut of the batch script in the Startup folder for the user.
+
+### macOS:
+There are multiple ways to run the script at startup. The cleanest way I've found is [Tommy's answer on Stack Overflow](https://stackoverflow.com/a/29338130). A simpler way is by using Apple Shortcuts:
+- Create a shortcut from the Shortcuts app to run shell script and paste shell script to enter the virtual environment (optional) and invoke the python script.
+```
+source /full/path/to/project/naukri-resume-update/venv/bin/activate
+python /full/path/to/project/naukri-resume-update/run.py
+```
+- Add the shortcut to Dock.
+- Right click on the Dock shortcut > Options > Open at login.
+- Undock the shortcut.
+
 ## Project Structure
 
 ```bash
@@ -100,6 +118,13 @@ naukri-resume-updater/
 2. **Environment Variable Errors**: Double-check the `.env` file to ensure your credentials are correct.
 3. **Selenium WebDriver Timeout**: Sometimes, Naukri's site may take longer to load. You can adjust the timeout values in `run.py` to wait longer for specific elements to appear.
 4. **Resume Not Uploading**: Ensure that your resume is saved as `Resume.pdf` in the `resume/` folder.
+5. **Unable to Run at Startup**: Try replacing the resume path with it's full absolute path:
+    ```
+    # Update the following line
+    resume_path = os.path.abspath(os.path.join("resume", "Resume.pdf"))
+    # With the following, with your absolute path to project (according to Windows and macOS)
+    resume_path = '/full/path/to/project/naukri-resume-update/resume/Resume.pdf'
+    ```
 
 ## Compatibility
 
